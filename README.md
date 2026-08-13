@@ -215,13 +215,3 @@ Main papers include:
 * Sensitivity of (L_1) Minimization to Parameter Choice
 * The Trimmed Lasso
 * Fast Iterative Hard Thresholding Methods with Pruning Gradient Computations
-
----
-
-## 8. Current Status
-
-This project is still in the early implementation stage.
-
-The first coding target is to build a small sparse portfolio prototype using Yahoo Finance data and Gurobi.
-
-After that, the same structure will be extended to OR-Library portfolio datasets and sparse regression datasets.
