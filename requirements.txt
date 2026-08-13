@@ -1,0 +1,12 @@
+# Placeholder dependency file for the dissertation project.
+# Add project dependencies here as implementations are added.
+
+numpy
+pandas
+scikit-learn
+matplotlib
+seaborn
+scipy
+yfinance
+pmlb
+gurobipy

@@ -1,0 +1,8 @@
+category,method,K,alpha,test_mse,features,selected_feature_names,status
+Best Overall,Best Subset (Gurobi),5.0,,2811.38510004708,5,"[""sex"", ""bmi"", ""bp"", ""s3"", ""s5""]",optimal
+Best Sparse,Best Subset (Gurobi),5.0,,2811.38510004708,5,"[""sex"", ""bmi"", ""bp"", ""s3"", ""s5""]",optimal
+Best Hard Cardinality,Best Subset (Gurobi),5.0,,2811.38510004708,5,"[""sex"", ""bmi"", ""bp"", ""s3"", ""s5""]",optimal
+Best Gurobi,Best Subset (Gurobi),5.0,,2811.38510004708,5,"[""sex"", ""bmi"", ""bp"", ""s3"", ""s5""]",optimal
+Best IHT,IHT,7.0,,2875.8299422098275,7,"[""sex"", ""bmi"", ""bp"", ""s1"", ""s3"", ""s4"", ""s5""]",converged
+Best LASSO,LASSO,,1.0,2824.568094049959,9,"[""age"", ""sex"", ""bmi"", ""bp"", ""s1"", ""s3"", ""s4"", ""s5"", ""s6""]",success
+OLS Baseline,OLS,,,2900.193628493482,10,"[""age"", ""sex"", ""bmi"", ""bp"", ""s1"", ""s2"", ""s3"", ""s4"", ""s5"", ""s6""]",success
