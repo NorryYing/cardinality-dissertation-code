@@ -1,0 +1,45 @@
+% Auto-generated appendix table of algorithm parameter settings.
+% Required package in Overleaf preamble:
+% \usepackage{booktabs}
+
+\begin{table}[htbp]
+\centering
+\small
+\setlength{\tabcolsep}{5pt}
+\caption{Algorithm Parameter Settings Used in Portfolio and Regression Experiments}
+\label{tab:appendix_algorithm_parameters}
+\begin{tabular}{p{3.2cm}p{3.6cm}p{3.0cm}p{6.2cm}}
+\toprule
+Method & Parameter & Value & Notes \\
+\midrule
+Portfolio Gurobi Cardinality & Time limit per solve call & \texttt{min(remaining, 60)} seconds & Set in experiment loop (OR-Library run) to enforce a per-model cap within the global budget. \\
+Portfolio Gurobi Cardinality & Global time budget & 600 seconds & \texttt{global\_time\_budget\_seconds = 600} in OR-Library experiment script. \\
+Portfolio Gurobi Cardinality (implementation) & \texttt{time\_limit} default & 600 seconds & Default argument in model function; overridden by experiment setting above. \\
+Genetic Algorithm (OR-Library) & \texttt{population\_size} & 50 & Explicitly set in OR-Library experiment script. \\
+Genetic Algorithm (OR-Library) & \texttt{generations} & 50 & Uses \texttt{GA\_GENERATIONS = 50} in OR-Library experiment script. \\
+Genetic Algorithm (OR-Library) & \texttt{mutation\_rate} & 0.1 & Explicitly set in OR-Library experiment script. \\
+Genetic Algorithm (OR-Library) & \texttt{time\_limit\_seconds} & remaining global budget & Passed as \texttt{remaining}; each subset evaluation also capped internally by \texttt{min(60, remaining\_time)} in implementation. \\
+Simulated Annealing (OR-Library) & \texttt{iterations} & 500 & Uses \texttt{SA\_ITERATIONS = 500} in OR-Library experiment script. \\
+Simulated Annealing (OR-Library) & \texttt{initial\_temp} & 1.0 & Explicitly set in OR-Library experiment script. \\
+Simulated Annealing (OR-Library) & \texttt{cooling\_rate} & 0.995 & Explicitly set in OR-Library experiment script. \\
+Simulated Annealing (OR-Library) & \texttt{time\_limit\_seconds} & remaining global budget & Passed as \texttt{remaining}; each subset evaluation also capped internally by \texttt{min(60, remaining\_time)} in implementation. \\
+IHT (implementation default) & \texttt{learning\_rate} & default (auto) & If not provided, implementation sets \texttt{learning\_rate = 0.5/L}. \\
+IHT (implementation default) & \texttt{max\_iter} & default 1000 & Default in \texttt{solve\_iht\_regression}. \\
+IHT (implementation default) & \texttt{tol} & default \texttt{1e-6} & Default in \texttt{solve\_iht\_regression}. \\
+IHT (implementation default) & \texttt{n\_restarts} & default 10 & Default in \texttt{solve\_iht\_regression}. \\
+IHT (implementation default) & \texttt{refit\_support} & default True & Default in \texttt{solve\_iht\_regression}. \\
+IHT (Diabetes experiment) & \texttt{learning\_rate} & None & Explicitly passed as None (auto). \\
+IHT (Diabetes experiment) & \texttt{max\_iter}, \texttt{tol}, \texttt{n\_restarts}, \texttt{refit\_support} & 1000, \texttt{1e-6}, 10, True & Explicitly set in diabetes experiment script. \\
+IHT (PMLB experiment) & \texttt{max\_iter}, \texttt{n\_restarts}, \texttt{refit\_support} & 1000, 10, True & Explicitly set in PMLB script; \texttt{learning\_rate} and \texttt{tol} not explicitly set (implementation defaults). \\
+IHT (Communities experiment) & \texttt{n\_restarts}, \texttt{refit\_support} & 10, True & Explicitly set in communities script; \texttt{learning\_rate}, \texttt{max\_iter}, \texttt{tol} not explicitly set (implementation defaults). \\
+LASSO (Diabetes) & Alpha grid & [0.001, 0.01, 0.1, 1.0] & Explicitly set in diabetes experiment script. \\
+LASSO (PMLB) & Alpha grid & [0.001, 0.01, 0.1, 1.0, 10.0] & Explicitly set in PMLB experiment script. \\
+LASSO (Communities) & Alpha grid & [0.001, 0.01, 0.1, 1.0] & Explicitly set in communities experiment script. \\
+Portfolio experiments & K values & OR-Library: [5, 10, 20] & Set as \texttt{K\_VALUES} in OR-Library portfolio script. \\
+Portfolio experiments & K values & Yahoo 5-stock test: 3; Yahoo 20-stock test: 5 & Explicitly passed in Yahoo portfolio experiment script. \\
+Regression experiments & K values & Diabetes: [3, 5, 7] & Explicitly set as \texttt{K\_values} in diabetes regression script. \\
+Regression experiments & K values & PMLB: [5, 10, 15] & Explicitly set as \texttt{K\_VALUES} in PMLB regression script. \\
+Regression experiments & K values & Communities: [5, 10, 15] & Explicitly set as \texttt{K\_VALUES} in communities regression script. \\
+\bottomrule
+\end{tabular}
+\end{table}
