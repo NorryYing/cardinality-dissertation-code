@@ -2,7 +2,7 @@
 
 Inputs
 ------
-- results/tables/portfolio_orlibrary_full_results.csv
+- results/tables/portfolio_orlibrary_full_summary.csv
 - results/tables/portfolio_overall_summary.csv
 
 Outputs
@@ -25,7 +25,7 @@ ROOT = Path(__file__).resolve().parents[1]
 TABLES_DIR = ROOT / "results" / "tables"
 FIGURES_DIR = ROOT / "results" / "figures"
 
-FULL_RESULTS_PATH = TABLES_DIR / "portfolio_orlibrary_full_results.csv"
+FULL_RESULTS_PATH = TABLES_DIR / "portfolio_orlibrary_full_summary.csv"
 OVERALL_SUMMARY_PATH = TABLES_DIR / "portfolio_overall_summary.csv"
 COMPACT_SUMMARY_PATH = TABLES_DIR / "portfolio_orlibrary_compact_summary.csv"
 
@@ -49,13 +49,17 @@ def _ensure_dirs() -> None:
 
 
 def _load_tables() -> tuple[pd.DataFrame, pd.DataFrame]:
-    if not FULL_RESULTS_PATH.exists():
-        raise FileNotFoundError(f"Missing full OR-Library results file: {FULL_RESULTS_PATH}")
     if not OVERALL_SUMMARY_PATH.exists():
         raise FileNotFoundError(f"Missing overall portfolio summary file: {OVERALL_SUMMARY_PATH}")
 
-    full_results = pd.read_csv(FULL_RESULTS_PATH)
     overall_summary = pd.read_csv(OVERALL_SUMMARY_PATH)
+
+    # Use OR-Library rows from the overall summary for the two main line plots.
+    full_results = overall_summary[
+        (overall_summary["experiment"] == "OR-Library")
+        & (overall_summary["category"].isin(CATEGORY_ORDER))
+    ].copy()
+
     return full_results, overall_summary
 
 
@@ -66,9 +70,6 @@ def _prepare_full_orlibrary(full_results: pd.DataFrame) -> pd.DataFrame:
         "method",
         "variance",
         "number_of_selected_assets",
-        "solve_time",
-        "reduced_instance",
-        "reduction_rule",
     }
     missing = sorted(required - set(full_results.columns))
     if missing:
@@ -88,7 +89,8 @@ def _prepare_full_orlibrary(full_results: pd.DataFrame) -> pd.DataFrame:
     df["K"] = pd.to_numeric(df["K"], errors="coerce")
     df["variance"] = pd.to_numeric(df["variance"], errors="coerce")
     df["number_of_selected_assets"] = pd.to_numeric(df["number_of_selected_assets"], errors="coerce")
-    df["solve_time"] = pd.to_numeric(df["solve_time"], errors="coerce")
+    if "solve_time" in df.columns:
+        df["solve_time"] = pd.to_numeric(df["solve_time"], errors="coerce")
 
     df = df.dropna(subset=["dataset", "K", "method"])
     df = df.sort_values(["dataset", "K", "method"]).reset_index(drop=True)
@@ -125,12 +127,8 @@ def _plot_variance_by_k_and_method(df: pd.DataFrame) -> None:
     for idx in range(len(datasets), len(axes)):
         axes[idx].axis("off")
 
-    handles, labels = axes[0].get_legend_handles_labels()
-    if handles and labels:
-        fig.legend(handles, labels, loc="upper center", ncol=4, frameon=False, title="Method")
-
-    fig.suptitle("OR-Library: Portfolio Variance by K and Method", y=1.03, fontsize=12)
-    fig.tight_layout()
+    fig.suptitle("OR-Library: Portfolio Variance by K and Method", fontsize=14, y=0.98)
+    fig.tight_layout(rect=[0, 0, 1, 0.94])
     fig.savefig(VARIANCE_FIG_PATH, dpi=300, bbox_inches="tight")
     plt.close(fig)
 
@@ -170,12 +168,8 @@ def _plot_selected_assets_by_k_and_method(df: pd.DataFrame) -> None:
     for idx in range(len(datasets), len(axes)):
         axes[idx].axis("off")
 
-    handles, labels = axes[0].get_legend_handles_labels()
-    if handles and labels:
-        fig.legend(handles, labels, loc="upper center", ncol=3, frameon=False, title="Method")
-
-    fig.suptitle("OR-Library: Number of Selected Assets by K and Method", y=1.03, fontsize=12)
-    fig.tight_layout()
+    fig.suptitle("OR-Library: Number of Selected Assets by K and Method", fontsize=14, y=0.98)
+    fig.tight_layout(rect=[0, 0, 1, 0.94])
     fig.savefig(SELECTED_ASSETS_FIG_PATH, dpi=300, bbox_inches="tight")
     plt.close(fig)
 
