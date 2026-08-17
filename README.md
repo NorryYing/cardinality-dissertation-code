@@ -1,25 +1,29 @@
 # Hard Cardinality Constraints: Computational Experiments
 
-This repository contains Python code for my MSc dissertation project on optimization problems with hard cardinality constraints.
+This repository contains the Python code for my MSc dissertation project on optimization problems with hard cardinality constraints.
 
-The main aim is to compare different solution methods on two general cases:
+The dissertation is method-focused. It studies how different exact, relaxation-based, and heuristic methods perform when only a limited number of variables are allowed to be selected.
+
+Two computational cases are considered:
 
 1. Sparse portfolio optimization
 2. Sparse linear regression / feature selection
 
-The project focuses on how different methods deal with the requirement that only a limited number of variables can be selected.
+The main comparison focuses on solution quality, sparsity, runtime where available, and solver status or optimality gap for Gurobi-based models.
 
 ---
 
 ## 1. Project Direction
 
-The dissertation is method-focused rather than only application-focused. The main topic is hard cardinality constraints.
+The main topic of this project is optimization with hard cardinality constraints.
+
+A hard cardinality constraint directly limits the number of selected decision variables. This type of constraint appears in many sparse optimization problems, where the aim is not only to obtain a good objective value but also to produce a simpler and more interpretable solution.
 
 In sparse portfolio optimization, the cardinality constraint limits the number of selected assets in a portfolio.
 
 In sparse linear regression, the cardinality constraint limits the number of selected features in the regression model.
 
-The computational comparison will consider solution quality, sparsity, runtime, and optimality gap when a solver-based method is used.
+This repository implements and compares several methods for these two cases.
 
 ---
 
@@ -27,35 +31,35 @@ The computational comparison will consider solution quality, sparsity, runtime, 
 
 ### 2.1 Sparse Portfolio Optimization
 
-The portfolio problem is based on the mean-variance portfolio model. The sparse version adds a cardinality constraint so that at most (K) assets can be selected.
+The portfolio optimization problem is based on the mean-variance portfolio model. The sparse version adds a cardinality constraint so that at most K assets can be selected.
 
-Planned methods:
+The implemented methods are:
 
 * No-sparsity mean-variance portfolio model
-* Gurobi MIP / MIQP cardinality-constrained portfolio model
+* Gurobi cardinality-constrained portfolio model
 * Genetic Algorithm heuristic
 * Simulated Annealing heuristic
 
-The Gurobi model is used as the main solver-based method because it can model the hard cardinality constraint directly with binary variables.
+The Gurobi model is used as the main solver-based benchmark because it can model the hard cardinality constraint directly using binary variables.
 
-The heuristic methods are used as comparison methods because they can search for good sparse portfolios without solving the full MIP / MIQP model exactly.
+The Genetic Algorithm and Simulated Annealing methods are used as heuristic comparison methods. They search over sparse asset subsets and then evaluate each selected subset through the corresponding restricted portfolio optimization problem.
 
 ### 2.2 Sparse Linear Regression / Feature Selection
 
 The sparse regression problem aims to fit a regression model using only a limited number of features.
 
-Planned methods:
+The implemented methods are:
 
 * Ordinary least squares without sparsity
-* Gurobi MIQP best subset selection
 * LASSO
+* Gurobi MIQP best subset selection
 * Iterative Hard Thresholding
 
-The Gurobi MIQP model is used as the main solver-based method because it directly controls the number of selected features.
+The Gurobi MIQP model is used as the direct hard-cardinality benchmark because it controls the number of selected features explicitly through binary variables.
 
-LASSO is used as an (L_1) relaxation baseline.
+LASSO is used as an L1 relaxation baseline.
 
-IHT is used as a hard-thresholding method because it directly keeps a (k)-sparse solution during the algorithm.
+Iterative Hard Thresholding is used as a hard-thresholding method because it directly keeps a K-sparse solution during the algorithm.
 
 ---
 
@@ -63,31 +67,28 @@ IHT is used as a hard-thresholding method because it directly keeps a (k)-sparse
 
 ### 3.1 Portfolio Optimization Datasets
 
-Planned datasets:
+The portfolio experiments use:
 
-* OR-Library port1--port5
-* Yahoo Finance / S&P 500 sample
+* OR-Library port1--port5 benchmark datasets
+* Yahoo Finance stock price data
 
-The OR-Library datasets are used as benchmark portfolio datasets. They include expected returns, standard deviations, and correlations between assets.
+The OR-Library datasets include expected returns, standard deviations, and correlations between assets. These are used to construct the covariance matrix for the portfolio optimization models.
 
-Yahoo Finance data is used as a more realistic market data source. Historical stock prices need to be downloaded first. Then returns, mean returns, and covariance matrices are calculated.
+Yahoo Finance data is used as a market-data example. Historical adjusted closing prices are downloaded and converted into returns, mean returns, and covariance matrices.
 
 ### 3.2 Sparse Regression / Feature Selection Datasets
 
-Planned datasets:
+The sparse regression experiments use:
 
 * Diabetes dataset
-* Gisette
-* Communities and Crime
-* 197_cpu_act from PMLB
+* 197_cpu_act dataset from PMLB
+* Communities and Crime dataset
 
-The Diabetes dataset is used as a small starting dataset.
+The Diabetes dataset is used as a small regression example.
 
-Gisette is used as a high-dimensional feature selection dataset.
+The 197_cpu_act dataset is used as a medium-sized regression dataset.
 
-Communities and Crime is used as a real regression dataset with more predictors.
-
-197_cpu_act is used as a medium-size regression dataset from PMLB.
+The Communities and Crime dataset is used as a real regression dataset with a larger number of predictors. For computational tractability, the experiments use a reduced feature set selected from the training data.
 
 ---
 
@@ -114,7 +115,13 @@ cardinality_dissertation_code/
 │   ├── run_portfolio_yahoo_test.py
 │   ├── run_portfolio_orlibrary.py
 │   ├── run_regression_diabetes.py
-│   └── run_regression_experiments.py
+│   ├── run_regression_pmlb.py
+│   ├── run_regression_communities.py
+│   ├── create_portfolio_overall_summary.py
+│   ├── create_portfolio_final_plots.py
+│   ├── create_regression_overall_summary.py
+│   ├── create_regression_figures.py
+│   └── create_appendix_figures.py
 │
 ├── results/
 │   ├── tables/
@@ -131,7 +138,13 @@ cardinality_dissertation_code/
 Install the required Python packages:
 
 ```bash
-pip install numpy pandas scikit-learn matplotlib yfinance pmlb gurobipy
+pip install numpy pandas scikit-learn matplotlib seaborn yfinance pmlb gurobipy
+```
+
+Alternatively, install from the requirements file:
+
+```bash
+pip install -r requirements.txt
 ```
 
 Gurobi also requires a valid academic license.
@@ -145,26 +158,27 @@ model = gp.Model()
 print("Gurobi is working")
 ```
 
+The Gurobi license file should not be uploaded to GitHub.
+
 ---
 
-## 6. Planned Experiments
+## 6. Experiments
 
-### Portfolio Experiments
+### 6.1 Portfolio Experiments
 
-The portfolio experiments will first be tested on a small Yahoo Finance sample.
+The portfolio experiments include Yahoo Finance test cases and OR-Library benchmark instances.
 
-The planned workflow is:
+The workflow is:
 
-1. Download stock prices
-2. Calculate returns
-3. Estimate mean return vector and covariance matrix
-4. Solve the portfolio problem without sparsity
-5. Solve the sparse portfolio problem using Gurobi
-6. Solve the sparse portfolio problem using Genetic Algorithm
-7. Solve the sparse portfolio problem using Simulated Annealing
-8. Compare the results
+1. Load or download portfolio data
+2. Calculate returns, expected returns, and covariance matrices where needed
+3. Solve the no-sparsity mean-variance portfolio model
+4. Solve the sparse portfolio problem using Gurobi
+5. Solve the sparse portfolio problem using Genetic Algorithm
+6. Solve the sparse portfolio problem using Simulated Annealing
+7. Compare the results across methods and values of K
 
-Comparison metrics:
+The main comparison metrics are:
 
 * Portfolio variance
 * Portfolio risk
@@ -172,46 +186,127 @@ Comparison metrics:
 * Number of selected assets
 * Runtime
 * Gurobi optimality gap
+* Solver status
 
-### Regression Experiments
+To run the OR-Library portfolio experiments:
 
-The regression experiments will first be tested on the Diabetes dataset.
+```bash
+python experiments/run_portfolio_orlibrary.py
+```
 
-The planned workflow is:
+To run the Yahoo Finance portfolio test:
 
-1. Load dataset
-2. Standardize features
-3. Split into training and testing data
-4. Solve ordinary least squares without sparsity
-5. Solve sparse regression using Gurobi MIQP
-6. Solve LASSO
-7. Solve IHT
-8. Compare the results
+```bash
+python experiments/run_portfolio_yahoo_test.py
+```
 
-Comparison metrics:
+To create portfolio summary tables and figures:
+
+```bash
+python experiments/create_portfolio_overall_summary.py
+python experiments/create_portfolio_final_plots.py
+```
+
+### 6.2 Regression Experiments
+
+The regression experiments compare sparse and non-sparse regression methods on the selected datasets.
+
+The workflow is:
+
+1. Load the dataset
+2. Preprocess and standardize features
+3. Split the data into training and testing sets
+4. Fit ordinary least squares without sparsity
+5. Fit LASSO
+6. Solve best subset selection using Gurobi MIQP
+7. Fit Iterative Hard Thresholding
+8. Compare prediction performance and sparsity
+
+The main comparison metrics are:
 
 * Training MSE
 * Test MSE
 * Number of selected features
-* Runtime
-* Gurobi optimality gap
+* Selected feature names
+* Runtime where available
+* Gurobi solver status
+
+To run the regression experiments:
+
+```bash
+python experiments/run_regression_diabetes.py
+python experiments/run_regression_pmlb.py
+python experiments/run_regression_communities.py
+```
+
+To create regression summary tables and figures:
+
+```bash
+python experiments/create_regression_overall_summary.py
+python experiments/create_regression_figures.py
+```
 
 ---
 
-## 7. Literature Connection
+## 7. Results
 
-The portfolio part is mainly related to cardinality-constrained portfolio optimization and sparse portfolio selection.
+The generated results are stored in:
 
-The regression part is mainly related to best subset selection, LASSO-type methods, and hard-thresholding methods.
+```text
+results/tables/
+results/figures/
+```
 
-The selected papers are used as representative examples of different method families rather than a complete review of all papers in each area.
+The tables include portfolio and regression summary results, while the figures are used to visualize the comparison between methods.
 
-Main papers include:
+Examples of generated outputs include:
 
-* Cardinality Minimization, Constraints, and Regularization: A Survey
+* Portfolio variance by dataset, K, and method
+* Number of selected assets by dataset, K, and method
+* Portfolio runtime heatmap
+* Regression test MSE comparison
+* Number of selected regression features
+* Appendix figures for additional comparison
+
+---
+
+## 8. Literature Connection
+
+The portfolio part is related to cardinality-constrained portfolio optimization and sparse portfolio selection.
+
+The regression part is related to best subset selection, LASSO-type methods, and hard-thresholding methods.
+
+The selected papers are used as representative examples of different method families rather than as a complete review of all work in these areas.
+
+Main references connected to the computational methods include:
+
+* Portfolio Selection
 * Heuristics for Cardinality Constrained Portfolio Optimisation
 * A Scalable Algorithm for Sparse Portfolio Selection
 * Best Subset Selection via a Modern Optimization Lens
-* Sensitivity of (L_1) Minimization to Parameter Choice
+* Fast Best Subset Selection: Coordinate Descent and Local Combinatorial Optimization Algorithms
+* An Alternating Method for Cardinality-Constrained Optimization
+* Sensitivity of L1 Minimization to Parameter Choice
 * The Trimmed Lasso
 * Fast Iterative Hard Thresholding Methods with Pruning Gradient Computations
+* Cardinality Minimization, Constraints, and Regularization: A Survey
+
+---
+
+## 9. Notes
+
+Some experiments require Gurobi, so results may depend on whether a valid Gurobi license is available.
+
+Yahoo Finance data may change depending on the download date and data availability.
+
+The Gurobi license file is not included in this repository and should not be committed.
+
+---
+
+## 10. Dissertation Context
+
+This code supports the MSc dissertation:
+
+**Optimization Problems with Hard Cardinality Constraints: A Study of Approximate Solution Methods**
+
+The code is intended to provide a reproducible computational basis for the portfolio optimization and sparse regression experiments discussed in the dissertation.
