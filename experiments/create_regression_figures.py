@@ -28,6 +28,12 @@ FIG_MSE = FIGURES_DIR / "regression_test_mse_by_dataset_method.png"
 FIG_FEATURES = FIGURES_DIR / "regression_selected_features_by_dataset_method.png"
 FIG_SCATTER = FIGURES_DIR / "regression_mse_vs_sparsity.png"
 
+TITLE_FONTSIZE = 15
+AXIS_LABEL_FONTSIZE = 12
+TICK_LABEL_FONTSIZE = 10
+LEGEND_FONTSIZE = 10
+LEGEND_TITLE_FONTSIZE = 11
+
 METHOD_LABELS = {
     "OLS": "OLS",
     "LASSO": "LASSO",
@@ -103,7 +109,7 @@ def _plot_grouped_bar(df: pd.DataFrame, y_col: str, ylabel: str, title: str, out
         (1.5 * width),
     ]
 
-    fig, ax = plt.subplots(figsize=(11, 5.8))
+    fig, ax = plt.subplots(figsize=(11.5, 6.2))
 
     for idx, method in enumerate(methods_present):
         method_df = df[df["method"].astype(str) == method].set_index("dataset")
@@ -111,16 +117,17 @@ def _plot_grouped_bar(df: pd.DataFrame, y_col: str, ylabel: str, title: str, out
         bars_x = [x + offsets[idx] for x in x_positions]
         ax.bar(bars_x, values, width=width, label=method)
 
-    ax.set_title(title)
-    ax.set_xlabel("Dataset")
-    ax.set_ylabel(ylabel)
+    ax.set_title(title, fontsize=TITLE_FONTSIZE)
+    ax.set_xlabel("Dataset", fontsize=AXIS_LABEL_FONTSIZE)
+    ax.set_ylabel(ylabel, fontsize=AXIS_LABEL_FONTSIZE)
     ax.set_xticks(x_positions)
-    ax.set_xticklabels(datasets, rotation=20, ha="right")
-    ax.legend(title="Method")
+    ax.set_xticklabels(datasets, rotation=20, ha="right", fontsize=TICK_LABEL_FONTSIZE)
+    ax.tick_params(axis="y", labelsize=TICK_LABEL_FONTSIZE)
+    ax.legend(title="Method", fontsize=LEGEND_FONTSIZE, title_fontsize=LEGEND_TITLE_FONTSIZE)
     ax.grid(axis="y", linestyle="--", alpha=0.35)
 
     fig.tight_layout()
-    fig.savefig(output_path, dpi=300)
+    fig.savefig(output_path, dpi=300, bbox_inches="tight")
     plt.close(fig)
 
 
@@ -137,9 +144,8 @@ def _plot_mse_vs_sparsity(df: pd.DataFrame) -> None:
         "IHT": "tab:red",
     }
 
-    fig, ax = plt.subplots(figsize=(8.5, 6))
+    fig, ax = plt.subplots(figsize=(10, 6.4))
 
-    # Plot points by (dataset, method) and annotate with short labels.
     for _, row in df.iterrows():
         dataset = str(row["dataset"])
         method = str(row["method"])
@@ -156,17 +162,11 @@ def _plot_mse_vs_sparsity(df: pd.DataFrame) -> None:
             edgecolors="black",
             linewidths=0.4,
         )
-        ax.annotate(
-            f"{dataset}-{method.split()[0]}",
-            (x, y),
-            textcoords="offset points",
-            xytext=(4, 4),
-            fontsize=7,
-        )
 
-    ax.set_title("Regression: Test MSE vs. Sparsity")
-    ax.set_xlabel("Number of Selected Features")
-    ax.set_ylabel("Test MSE")
+    ax.set_title("Regression: Test MSE vs. Sparsity", fontsize=TITLE_FONTSIZE)
+    ax.set_xlabel("Number of Selected Features", fontsize=AXIS_LABEL_FONTSIZE)
+    ax.set_ylabel("Test MSE", fontsize=AXIS_LABEL_FONTSIZE)
+    ax.tick_params(axis="both", labelsize=TICK_LABEL_FONTSIZE)
     ax.grid(True, linestyle="--", alpha=0.35)
 
     # Build compact legends: one for methods (color), one for datasets (marker).
@@ -197,12 +197,28 @@ def _plot_mse_vs_sparsity(df: pd.DataFrame) -> None:
         )
         dataset_handles.append(handle)
 
-    legend1 = ax.legend(handles=method_handles, title="Method", loc="upper right")
+    legend1 = ax.legend(
+        handles=method_handles,
+        title="Method",
+        loc="upper left",
+        bbox_to_anchor=(1.02, 1.0),
+        borderaxespad=0.0,
+        fontsize=LEGEND_FONTSIZE,
+        title_fontsize=LEGEND_TITLE_FONTSIZE,
+    )
     ax.add_artist(legend1)
-    ax.legend(handles=dataset_handles, title="Dataset", loc="lower right")
+    ax.legend(
+        handles=dataset_handles,
+        title="Dataset",
+        loc="lower left",
+        bbox_to_anchor=(1.02, 0.0),
+        borderaxespad=0.0,
+        fontsize=LEGEND_FONTSIZE,
+        title_fontsize=LEGEND_TITLE_FONTSIZE,
+    )
 
-    fig.tight_layout()
-    fig.savefig(FIG_SCATTER, dpi=300)
+    fig.tight_layout(rect=[0, 0, 0.82, 1])
+    fig.savefig(FIG_SCATTER, dpi=300, bbox_inches="tight")
     plt.close(fig)
 
 

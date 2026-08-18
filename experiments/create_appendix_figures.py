@@ -19,6 +19,11 @@ INPUT_PATH = ROOT / "results" / "tables" / "portfolio_overall_summary.csv"
 OUTPUT_DIR = ROOT / "results" / "figures"
 OUTPUT_PATH = OUTPUT_DIR / "appendix_portfolio_heuristic_gap_vs_gurobi.png"
 
+TITLE_FONTSIZE = 15
+AXIS_LABEL_FONTSIZE = 12
+TICK_LABEL_FONTSIZE = 10
+LEGEND_FONTSIZE = 12
+LEGEND_TITLE_FONTSIZE = 13
 
 CATEGORIES_REQUIRED = ["Gurobi Cardinality", "Genetic Algorithm", "Simulated Annealing"]
 
@@ -70,7 +75,7 @@ def _plot_gap(gaps: pd.DataFrame) -> None:
     x = list(range(len(labels)))
     width = 0.36
 
-    fig, ax = plt.subplots(figsize=(12, 5.8))
+    fig, ax = plt.subplots(figsize=(12.5, 6.2))
 
     ga_vals = gaps["gap_genetic_algorithm"].tolist()
     sa_vals = gaps["gap_simulated_annealing"].tolist()
@@ -79,16 +84,20 @@ def _plot_gap(gaps: pd.DataFrame) -> None:
     ax.bar([i + width / 2 for i in x], sa_vals, width=width, label="Simulated Annealing - Cardinality")
 
     ax.axhline(0.0, color="black", linewidth=1.0, linestyle="--")
-    ax.set_title("Appendix: Heuristic Variance Gap vs Gurobi Cardinality (OR-Library Full Instances)")
-    ax.set_xlabel("Dataset and K")
-    ax.set_ylabel("Variance Gap (Heuristic - Gurobi Cardinality)")
+    ax.set_title(
+        "Appendix: Heuristic Variance Gap vs Gurobi Cardinality (OR-Library Full Instances)",
+        fontsize=TITLE_FONTSIZE,
+    )
+    ax.set_xlabel("Dataset and K", fontsize=AXIS_LABEL_FONTSIZE)
+    ax.set_ylabel("Variance Gap (Heuristic - Gurobi Cardinality)", fontsize=AXIS_LABEL_FONTSIZE)
     ax.set_xticks(x)
-    ax.set_xticklabels(labels, rotation=35, ha="right")
-    ax.legend()
+    ax.set_xticklabels(labels, rotation=35, ha="right", fontsize=TICK_LABEL_FONTSIZE)
+    ax.tick_params(axis="y", labelsize=TICK_LABEL_FONTSIZE)
+    ax.legend(fontsize=LEGEND_FONTSIZE, title_fontsize=LEGEND_TITLE_FONTSIZE)
     ax.grid(axis="y", linestyle="--", alpha=0.35)
 
     fig.tight_layout()
-    fig.savefig(OUTPUT_PATH, dpi=300)
+    fig.savefig(OUTPUT_PATH, dpi=300, bbox_inches="tight")
     plt.close(fig)
 
 

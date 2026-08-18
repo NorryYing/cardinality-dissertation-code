@@ -42,6 +42,14 @@ CATEGORY_ORDER = [
     "Best Sparse",
 ]
 
+TITLE_FONTSIZE = 17
+SUBPLOT_TITLE_FONTSIZE = 14
+AXIS_LABEL_FONTSIZE = 13
+TICK_LABEL_FONTSIZE = 11
+LEGEND_FONTSIZE = 12
+LEGEND_TITLE_FONTSIZE = 13
+ANNOTATION_FONTSIZE = 9
+
 
 def _ensure_dirs() -> None:
     TABLES_DIR.mkdir(parents=True, exist_ok=True)
@@ -102,8 +110,10 @@ def _plot_variance_by_k_and_method(df: pd.DataFrame) -> None:
     ncols = 3
     nrows = (len(datasets) + ncols - 1) // ncols
 
-    fig, axes = plt.subplots(nrows=nrows, ncols=ncols, figsize=(4.8 * ncols, 3.8 * nrows), sharex=True)
+    fig, axes = plt.subplots(nrows=nrows, ncols=ncols, figsize=(5.1 * ncols, 4.0 * nrows), sharex=True)
     axes = axes.flatten() if hasattr(axes, "flatten") else [axes]
+    legend_handles = None
+    legend_labels = None
 
     for idx, dataset in enumerate(datasets):
         ax = axes[idx]
@@ -117,17 +127,36 @@ def _plot_variance_by_k_and_method(df: pd.DataFrame) -> None:
             marker="o",
             ax=ax,
         )
-        ax.set_title(dataset)
-        ax.set_xlabel("K")
-        ax.set_ylabel("Portfolio Variance")
+        ax.set_title(dataset, fontsize=SUBPLOT_TITLE_FONTSIZE)
+        ax.set_xlabel("K", fontsize=AXIS_LABEL_FONTSIZE)
+        ax.set_ylabel("Portfolio Variance", fontsize=AXIS_LABEL_FONTSIZE)
+        ax.tick_params(axis="both", labelsize=TICK_LABEL_FONTSIZE)
 
-        if idx != 0 and ax.get_legend() is not None:
+        if ax.get_legend() is not None:
+            ax.get_legend().set_title("Method")
+            plt.setp(ax.get_legend().get_texts(), fontsize=LEGEND_FONTSIZE)
+            plt.setp(ax.get_legend().get_title(), fontsize=LEGEND_TITLE_FONTSIZE)
+            if legend_handles is None and legend_labels is None:
+                legend_handles, legend_labels = ax.get_legend_handles_labels()
             ax.get_legend().remove()
 
-    for idx in range(len(datasets), len(axes)):
+    for idx in range(len(datasets), len(axes) - 1):
         axes[idx].axis("off")
 
-    fig.suptitle("OR-Library: Portfolio Variance by K and Method", fontsize=14, y=0.98)
+    legend_ax = axes[-1]
+    legend_ax.axis("off")
+    if legend_handles is not None and legend_labels is not None:
+        legend_ax.legend(
+            legend_handles,
+            legend_labels,
+            loc="center",
+            title="Method",
+            fontsize=LEGEND_FONTSIZE,
+            title_fontsize=LEGEND_TITLE_FONTSIZE,
+            frameon=True,
+        )
+
+    fig.suptitle("OR-Library: Portfolio Variance by K and Method", fontsize=TITLE_FONTSIZE, y=0.98)
     fig.tight_layout(rect=[0, 0, 1, 0.94])
     fig.savefig(VARIANCE_FIG_PATH, dpi=300, bbox_inches="tight")
     plt.close(fig)
@@ -138,8 +167,10 @@ def _plot_selected_assets_by_k_and_method(df: pd.DataFrame) -> None:
     ncols = 3
     nrows = (len(datasets) + ncols - 1) // ncols
 
-    fig, axes = plt.subplots(nrows=nrows, ncols=ncols, figsize=(4.8 * ncols, 3.8 * nrows), sharex=True)
+    fig, axes = plt.subplots(nrows=nrows, ncols=ncols, figsize=(5.1 * ncols, 4.0 * nrows), sharex=True)
     axes = axes.flatten() if hasattr(axes, "flatten") else [axes]
+    legend_handles = None
+    legend_labels = None
 
     for idx, dataset in enumerate(datasets):
         ax = axes[idx]
@@ -158,17 +189,36 @@ def _plot_selected_assets_by_k_and_method(df: pd.DataFrame) -> None:
         k_values = sorted(subset["K"].dropna().unique())
         ax.plot(k_values, k_values, linestyle="--", linewidth=1, color="black", label="selected_assets = K")
 
-        ax.set_title(dataset)
-        ax.set_xlabel("K")
-        ax.set_ylabel("Number of Selected Assets")
+        ax.set_title(dataset, fontsize=SUBPLOT_TITLE_FONTSIZE)
+        ax.set_xlabel("K", fontsize=AXIS_LABEL_FONTSIZE)
+        ax.set_ylabel("Number of Selected Assets", fontsize=AXIS_LABEL_FONTSIZE)
+        ax.tick_params(axis="both", labelsize=TICK_LABEL_FONTSIZE)
 
-        if idx != 0 and ax.get_legend() is not None:
+        if ax.get_legend() is not None:
+            ax.get_legend().set_title("Method")
+            plt.setp(ax.get_legend().get_texts(), fontsize=LEGEND_FONTSIZE)
+            plt.setp(ax.get_legend().get_title(), fontsize=LEGEND_TITLE_FONTSIZE)
+            if legend_handles is None and legend_labels is None:
+                legend_handles, legend_labels = ax.get_legend_handles_labels()
             ax.get_legend().remove()
 
-    for idx in range(len(datasets), len(axes)):
+    for idx in range(len(datasets), len(axes) - 1):
         axes[idx].axis("off")
 
-    fig.suptitle("OR-Library: Number of Selected Assets by K and Method", fontsize=14, y=0.98)
+    legend_ax = axes[-1]
+    legend_ax.axis("off")
+    if legend_handles is not None and legend_labels is not None:
+        legend_ax.legend(
+            legend_handles,
+            legend_labels,
+            loc="center",
+            title="Method",
+            fontsize=LEGEND_FONTSIZE,
+            title_fontsize=LEGEND_TITLE_FONTSIZE,
+            frameon=True,
+        )
+
+    fig.suptitle("OR-Library: Number of Selected Assets by K and Method", fontsize=TITLE_FONTSIZE, y=0.98)
     fig.tight_layout(rect=[0, 0, 1, 0.94])
     fig.savefig(SELECTED_ASSETS_FIG_PATH, dpi=300, bbox_inches="tight")
     plt.close(fig)
@@ -203,11 +253,17 @@ def _plot_runtime_heatmap(df: pd.DataFrame) -> bool:
         fmt=".2f",
         cmap="YlGnBu",
         cbar_kws={"label": "Solve Time (seconds)"},
+        annot_kws={"fontsize": ANNOTATION_FONTSIZE},
         ax=ax,
     )
-    ax.set_title("OR-Library: Runtime by Dataset, K, and Method")
-    ax.set_xlabel("Method")
-    ax.set_ylabel("Dataset and K")
+    ax.set_title("OR-Library: Runtime by Dataset, K, and Method", fontsize=TITLE_FONTSIZE)
+    ax.set_xlabel("Method", fontsize=AXIS_LABEL_FONTSIZE)
+    ax.set_ylabel("Dataset and K", fontsize=AXIS_LABEL_FONTSIZE)
+    ax.tick_params(axis="both", labelsize=TICK_LABEL_FONTSIZE)
+
+    colorbar = ax.collections[0].colorbar
+    colorbar.ax.tick_params(labelsize=TICK_LABEL_FONTSIZE)
+    colorbar.set_label("Solve Time (seconds)", fontsize=AXIS_LABEL_FONTSIZE)
 
     fig.tight_layout()
     fig.savefig(RUNTIME_FIG_PATH, dpi=300, bbox_inches="tight")
